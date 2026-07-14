@@ -18,16 +18,31 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Normalize phone to last 10 digits (handles leading zeros, country codes).
+     */
+    private String normalizePhone(String input) {
+        String digits = input.replaceAll("\\D", "");
+        if (digits.length() > 10) {
+            digits = digits.substring(digits.length() - 10);
+        }
+        return digits;
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Here username can be either email or phone
-        User user = userRepository.findByEmailOrPhone(username, username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email or phone: " + username));
+        // Normalize: if it looks like a phone, take last 10 digits; else lowercase email
+        String digitsOnly = username.replaceAll("\\D", "");
+        boolean looksLikePhone = username.matches("[+0-9 \\-().]+") && digitsOnly.length() >= 8;
+        String lookupKey = looksLikePhone ? normalizePhone(username) : username.toLowerCase();
+
+        User user = userRepository.findByEmailOrPhone(lookupKey, lookupKey)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                lookupKey, // Use same lookupKey so Spring Security username check passes
                 user.getPassword(),
-                new ArrayList<>() // Empty authorities list (no roles needed for this simple student app)
+                new ArrayList<>()
         );
     }
 }

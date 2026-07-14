@@ -22,6 +22,11 @@ const Register = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  // Validate email format strictly
+  const isValidEmail = (email) => {
+    return /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(email.trim());
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -31,10 +36,20 @@ const Register = () => {
       return;
     }
 
-    // Phone validation
+    // Email validation
+    if (!isValidEmail(email)) {
+      setError('Please enter a valid email address (e.g. name@gmail.com)');
+      return;
+    }
+
+    // Phone: strip non-digits, keep last 10 digits
     const phoneDigits = phone.replace(/\D/g, '');
-    if (phoneDigits.length < 10) {
-      setError('Phone number must be at least 10 digits long');
+    const normalizedPhone = phoneDigits.length > 10
+      ? phoneDigits.slice(-10)
+      : phoneDigits;
+
+    if (normalizedPhone.length !== 10) {
+      setError('Phone number must be exactly 10 digits');
       return;
     }
 
@@ -50,14 +65,13 @@ const Register = () => {
 
     setLoading(true);
     try {
-      // Just pass raw inputs, backend handles formatting/saving
-      await register(name, email, phoneDigits, hostel, password);
+      await register(name.trim(), email.trim().toLowerCase(), normalizedPhone, hostel.trim(), password);
       navigate('/marketplace');
     } catch (err) {
       if (!err.response) {
-        setError('Cannot connect to the server. Please check if the backend application is running!');
+        setError('Cannot connect to the server. Please try again later.');
       } else {
-        setError(err.response.data?.message || 'Registration failed. Email or phone number might already be in use.');
+        setError(err.response.data?.message || 'Registration failed. Please try again.');
       }
     } finally {
       setLoading(false);

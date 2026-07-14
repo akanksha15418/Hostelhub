@@ -37,17 +37,35 @@ const Login = () => {
       return;
     }
 
+    // Normalize: if it looks like a phone, strip non-digits and take last 10 digits
+    const digitsOnly = emailOrPhone.replace(/\D/g, '');
+    const looksLikePhone = /^[+0-9 \-().]+$/.test(emailOrPhone) && digitsOnly.length >= 8;
+
+    let normalizedInput;
+    if (looksLikePhone) {
+      normalizedInput = digitsOnly.length > 10 ? digitsOnly.slice(-10) : digitsOnly;
+      if (normalizedInput.length !== 10) {
+        setError('Please enter a valid 10-digit phone number');
+        return;
+      }
+    } else {
+      normalizedInput = emailOrPhone.trim().toLowerCase();
+      if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(normalizedInput)) {
+        setError('Please enter a valid email address or 10-digit phone number');
+        return;
+      }
+    }
+
     setLoading(true);
     try {
-      await login(emailOrPhone, password);
-      // Retrieve redirect route from router state if available
+      await login(normalizedInput, password);
       const from = location.state?.from?.pathname || '/marketplace';
       navigate(from, { replace: true });
     } catch (err) {
       if (!err.response) {
-        setError('Cannot connect to the server. Please check if the backend application is running!');
+        setError('Cannot connect to the server. Please try again later.');
       } else {
-        setError(err.response.data?.message || 'Invalid email/phone or password. Please try again.');
+        setError('Invalid email/phone or password. Please try again.');
       }
     } finally {
       setLoading(false);
