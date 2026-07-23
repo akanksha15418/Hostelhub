@@ -121,7 +121,14 @@ const MyListings = () => {
                     alt={product.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.target.src = 'https://images.unsplash.com/photo-1540553016722-983e48a2cd10?w=600&auto=format&fit=crop&q=60';
+                      e.target.style.display = 'none';
+                      e.target.parentNode.insertAdjacentHTML(
+                        'beforeend',
+                        `<div class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                          <span class="text-xs mt-2 font-medium">No Image</span>
+                        </div>`
+                      );
                     }}
                   />
                   {isSold && (
