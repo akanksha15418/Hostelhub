@@ -87,9 +87,10 @@ public class ProductController {
             Product savedProduct = productRepository.save(product);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(new ProductResponse(savedProduct));
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Failed to upload image: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to add product: " + e.getMessage()));
         }
     }
 
@@ -135,9 +136,10 @@ public class ProductController {
 
             Product updatedProduct = productRepository.save(product);
             return ResponseEntity.ok(new ProductResponse(updatedProduct));
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Failed to upload image: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to update product: " + e.getMessage()));
         }
     }
 

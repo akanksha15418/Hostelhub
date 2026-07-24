@@ -12,7 +12,6 @@ const AddProduct = () => {
   const [category, setCategory] = useState('');
   const [condition, setCondition] = useState('');
   const [imageFile, setImageFile] = useState(null);
-  const [imageUrlInput, setImageUrlInput] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
 
   const [loading, setLoading] = useState(false);
@@ -26,24 +25,16 @@ const AddProduct = () => {
         return;
       }
       setImageFile(file);
-      setImageUrlInput('');
       setImagePreview(URL.createObjectURL(file));
     }
-  };
-
-  const handleUrlChange = (e) => {
-    const url = e.target.value;
-    setImageUrlInput(url);
-    setImageFile(null);
-    setImagePreview(url);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (!title || !description || !price || !category || !condition || (!imageFile && !imageUrlInput.trim())) {
-      setError('Please fill in all fields and provide a product image (file or URL)');
+    if (!title || !description || !price || !category || !condition || !imageFile) {
+      setError('Please fill in all fields and select a product image');
       return;
     }
 
@@ -53,25 +44,22 @@ const AddProduct = () => {
     }
 
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
+    formData.append('title', title.trim());
+    formData.append('description', description.trim());
     formData.append('price', parseFloat(price));
     formData.append('category', category);
     formData.append('condition', condition);
-    if (imageFile) {
-      formData.append('image', imageFile);
-    } else if (imageUrlInput.trim()) {
-      formData.append('imageUrl', imageUrlInput.trim());
-    }
+    formData.append('image', imageFile);
 
     setLoading(true);
     try {
       await productService.create(formData);
       navigate('/marketplace');
     } catch (err) {
+      console.error("Product creation error: ", err);
       setError(
         err.response?.data?.message || 
-        'Failed to add product. Please try again.'
+        'Failed to add product. Make sure all fields are filled and server is running.'
       );
     } finally {
       setLoading(false);
@@ -184,7 +172,7 @@ const AddProduct = () => {
             </div>
           </div>
 
-          {/* Description */}
+          {/* Description — Disabled Grammarly */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description
@@ -193,6 +181,10 @@ const AddProduct = () => {
               required
               rows={4}
               maxLength={1000}
+              data-gramm="false"
+              data-gramm_editor="false"
+              data-enable-grammarly="false"
+              spellCheck={false}
               placeholder="Describe your product details: purchase date, condition notes, availability details etc."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -200,52 +192,33 @@ const AddProduct = () => {
             />
           </div>
 
-          {/* Image Upload or URL */}
+          {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Product Image
             </label>
-            <div className="space-y-3">
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <label className="w-full sm:w-auto flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-50 border-dashed rounded-xl px-4 py-5 cursor-pointer text-gray-500 hover:text-gray-700 flex-grow text-center text-sm">
-                  <Image size={20} className="text-gray-400" />
-                  <span>{imageFile ? imageFile.name : "Choose product image file"}</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <label className="w-full sm:w-auto flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-50 border-dashed rounded-xl px-4 py-6 cursor-pointer text-gray-500 hover:text-gray-700 flex-grow text-center text-sm">
+                <Image size={20} className="text-gray-400" />
+                <span>{imageFile ? imageFile.name : "Choose product image"}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+              {imagePreview && (
+                <div className="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-50 flex items-center justify-center">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
                   />
-                </label>
-                {imagePreview && (
-                  <div className="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-50 flex items-center justify-center">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="h-px bg-gray-200 flex-grow"></div>
-                <span className="text-xs text-gray-400 font-semibold uppercase">OR paste image link</span>
-                <div className="h-px bg-gray-200 flex-grow"></div>
-              </div>
-
-              <input
-                type="url"
-                placeholder="https://example.com/my-product-image.jpg"
-                value={imageUrlInput}
-                onChange={handleUrlChange}
-                className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-900"
-              />
+                </div>
+              )}
             </div>
-            <p className="text-xs text-gray-400 mt-2">Maximum file size: 5MB. You can upload an image file or paste a direct image URL.</p>
+            <p className="text-xs text-gray-400 mt-2">Maximum file size: 5MB. Only image files supported.</p>
           </div>
 
           {/* Submit */}

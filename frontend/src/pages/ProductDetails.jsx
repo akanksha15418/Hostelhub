@@ -101,6 +101,15 @@ const ProductDetails = () => {
   const isOwner = user && product.seller && user.id === product.seller.id;
   const isSold = product.status === 'SOLD';
 
+  const getFullImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('/uploads/')) {
+      const backendBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '');
+      return backendBase + url;
+    }
+    return url;
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[85vh]">
       {/* Back Link */}
@@ -113,7 +122,7 @@ const ProductDetails = () => {
         {/* Left Side: Product Image */}
         <div className="relative aspect-[4/3] bg-gray-50 rounded-xl overflow-hidden border border-gray-150 flex items-center justify-center">
           <img
-            src={product.imageUrl}
+            src={getFullImageUrl(product.imageUrl)}
             alt={product.title}
             className="w-full h-full object-cover"
             onError={(e) => {

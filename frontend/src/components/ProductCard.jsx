@@ -14,12 +14,21 @@ const ProductCard = ({ product, isWishlisted, onWishlistToggle }) => {
 
   const isSold = product.status === 'SOLD';
 
+  const getFullImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('/uploads/')) {
+      const backendBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '');
+      return backendBase + url;
+    }
+    return url;
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative flex flex-col h-full group">
       {/* Product Image */}
       <Link to={`/product/${product.id}`} className="relative block aspect-[4/3] bg-gray-100 overflow-hidden">
         <img
-          src={product.imageUrl}
+          src={getFullImageUrl(product.imageUrl)}
           alt={product.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {

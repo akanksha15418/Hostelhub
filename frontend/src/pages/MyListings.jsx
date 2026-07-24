@@ -112,12 +112,21 @@ const MyListings = () => {
             const isSold = product.status === 'SOLD';
             const isWorking = actionLoadingId === product.id;
 
+            const getFullImageUrl = (url) => {
+              if (!url) return '';
+              if (url.startsWith('/uploads/')) {
+                const backendBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '');
+                return backendBase + url;
+              }
+              return url;
+            };
+
             return (
               <div key={product.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm flex flex-col h-full relative">
                 {/* Image & Sold Overlay */}
                 <div className="aspect-[4/3] bg-gray-50 relative border-b border-gray-100 overflow-hidden">
                   <img
-                    src={product.imageUrl}
+                    src={getFullImageUrl(product.imageUrl)}
                     alt={product.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
