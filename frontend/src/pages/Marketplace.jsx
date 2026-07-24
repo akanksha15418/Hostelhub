@@ -90,6 +90,9 @@ const Marketplace = () => {
       setWishlistedIds(updated);
     } catch (err) {
       console.error('Failed to toggle wishlist item: ', err);
+      if (err.response?.status === 401) {
+        navigate('/login', { state: { from: { pathname: '/marketplace' } } });
+      }
     }
   };
 

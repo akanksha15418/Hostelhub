@@ -31,11 +31,8 @@ api.interceptors.response.use(
       // Token is invalid or expired
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Redirect to login if not already on public pages
-      const publicPaths = ['/login', '/register', '/', '/marketplace'];
       const currentPath = window.location.pathname;
-      const isPublicPath = publicPaths.includes(currentPath) || currentPath.startsWith('/product/');
-      if (!isPublicPath) {
+      if (currentPath !== '/login') {
         window.location.href = '/login?expired=true';
       }
     }

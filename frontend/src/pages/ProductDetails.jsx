@@ -58,6 +58,9 @@ const ProductDetails = () => {
       }
     } catch (err) {
       console.error('Failed to toggle wishlist: ', err);
+      if (err.response?.status === 401) {
+        navigate('/login', { state: { from: { pathname: `/product/${id}` } } });
+      }
     }
   };
 
