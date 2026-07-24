@@ -57,10 +57,17 @@ const AddProduct = () => {
       navigate('/marketplace');
     } catch (err) {
       console.error("Product creation error: ", err);
-      setError(
-        err.response?.data?.message || 
-        'Failed to add product. Make sure all fields are filled and server is running.'
-      );
+      if (!err.response) {
+        const targetUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+        setError(`Cannot connect to backend server (${targetUrl}). Render backend may be waking up (cold start 30s) or VITE_API_BASE_URL is missing in Vercel settings.`);
+      } else if (err.response.status === 401) {
+        setError('Your login session has expired. Please log in again.');
+      } else {
+        setError(
+          err.response?.data?.message || 
+          `Server Error (${err.response.status}): ${err.message}`
+        );
+      }
     } finally {
       setLoading(false);
     }

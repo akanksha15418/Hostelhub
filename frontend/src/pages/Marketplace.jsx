@@ -45,7 +45,12 @@ const Marketplace = () => {
       const data = await productService.getAll(category, activeSearch);
       setProducts(data);
     } catch (err) {
-      setError('Failed to load products. Make sure the backend server is running.');
+      if (!err.response) {
+        const targetUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+        setError(`Cannot connect to backend server (${targetUrl}). Render backend may be starting up or VITE_API_BASE_URL is not set in Vercel.`);
+      } else {
+        setError(`Failed to load products: ${err.response?.data?.message || err.message}`);
+      }
       console.error(err);
     } finally {
       setLoading(false);
