@@ -78,23 +78,13 @@ public class ImageUploadServiceImpl implements ImageUploadService {
             }
         }
 
-        // Local Upload Fallback
-        Path path = Paths.get(uploadDir);
-        if (!Files.exists(path)) {
-            Files.createDirectories(path);
+        // Base64 Data URI Fallback if Cloudinary is not configured
+        // This ensures images never break on Vercel or Render ephemeral filesystem
+        String mimeType = file.getContentType();
+        if (mimeType == null || !mimeType.startsWith("image/")) {
+            mimeType = "image/jpeg";
         }
-
-        String originalFilename = file.getOriginalFilename();
-        String extension = "";
-        if (originalFilename != null && originalFilename.contains(".")) {
-            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        }
-        
-        String filename = UUID.randomUUID().toString() + extension;
-        Path targetPath = path.resolve(filename);
-        
-        Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-        
-        return backendUrl + "/uploads/" + filename;
+        String base64 = java.util.Base64.getEncoder().encodeToString(file.getBytes());
+        return "data:" + mimeType + ";base64," + base64;
     }
 }

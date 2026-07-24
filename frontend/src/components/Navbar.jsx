@@ -40,6 +40,14 @@ const Navbar = () => {
               Marketplace
             </Link>
 
+            <Link 
+              to="/add-product" 
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm"
+            >
+              <PlusCircle size={16} />
+              Sell Item
+            </Link>
+
             {isAuthenticated ? (
               <>
                 <Link to="/wishlist" className={isActive('/wishlist') ? activeClass : inactiveClass}>
@@ -52,14 +60,7 @@ const Navbar = () => {
                 </Link>
                 <Link to="/profile" className={isActive('/profile') ? activeClass : inactiveClass}>
                   <User size={16} />
-                  Profile ({user?.name.split(' ')[0]})
-                </Link>
-                <Link 
-                  to="/add-product" 
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm"
-                >
-                  <PlusCircle size={16} />
-                  Sell Item
+                  Profile ({user?.name ? user.name.split(' ')[0] : 'User'})
                 </Link>
                 <button 
                   onClick={handleLogout} 
@@ -76,7 +77,7 @@ const Navbar = () => {
                 </Link>
                 <Link 
                   to="/register" 
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-sm"
+                  className="border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-medium px-4 py-2 rounded-lg transition-colors"
                 >
                   Register
                 </Link>
@@ -106,6 +107,15 @@ const Navbar = () => {
           >
             Marketplace
           </Link>
+
+          <Link 
+            to="/add-product" 
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-center font-medium px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
+            onClick={() => setIsOpen(false)}
+          >
+            <PlusCircle size={16} />
+            Sell Item
+          </Link>
           
           {isAuthenticated ? (
             <>
@@ -132,14 +142,6 @@ const Navbar = () => {
               >
                 <User size={16} />
                 Profile ({user?.name})
-              </Link>
-              <Link 
-                to="/add-product" 
-                className="bg-indigo-600 hover:bg-indigo-700 text-white text-center font-medium px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <PlusCircle size={16} />
-                Sell Item
               </Link>
               <button 
                 onClick={handleLogout} 

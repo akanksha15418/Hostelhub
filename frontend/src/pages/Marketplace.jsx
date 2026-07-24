@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { productService, wishlistService } from '../services/api';
 import ProductCard from '../components/ProductCard';
-import { Search, Filter, Loader, RefreshCw } from 'lucide-react';
+import { Search, Filter, Loader, RefreshCw, PlusCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Marketplace = () => {
   const { isAuthenticated } = useAuth();
@@ -101,34 +102,44 @@ const Marketplace = () => {
           <p className="text-gray-500 mt-1 text-sm">Discover second-hand essentials, academic material, and snacks.</p>
         </div>
         
-        {/* Search Bar Form */}
-        <form onSubmit={handleSearchSubmit} className="w-full md:w-auto flex gap-2">
-          <div className="relative flex-grow md:w-80">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full border border-gray-300 pl-10 pr-8 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-900"
-            />
-            <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
-            {search && (
-              <button
-                type="button"
-                onClick={handleSearchClear}
-                className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 text-xs font-semibold"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          <button
-            type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
+        {/* Search Bar Form & Sell Button */}
+        <div className="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+          <form onSubmit={handleSearchSubmit} className="flex gap-2 flex-grow md:w-80">
+            <div className="relative flex-grow">
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full border border-gray-300 pl-10 pr-8 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-900"
+              />
+              <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
+              {search && (
+                <button
+                  type="button"
+                  onClick={handleSearchClear}
+                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 text-xs font-semibold"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
+            >
+              Search
+            </button>
+          </form>
+
+          <Link
+            to="/add-product"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg text-sm flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shadow-sm"
           >
-            Search
-          </button>
-        </form>
+            <PlusCircle size={16} />
+            Sell Item
+          </Link>
+        </div>
       </div>
 
       {/* Category Tabs */}

@@ -58,7 +58,7 @@ public class ProductController {
         return ResponseEntity.ok(new ProductResponse(product));
     }
 
-    // 3. Add a new product (Multipart form data)
+    // 3. Add a new product (Multipart form data or image URL)
     @PostMapping
     public ResponseEntity<?> addProduct(
             @RequestParam("title") String title,
@@ -66,14 +66,22 @@ public class ProductController {
             @RequestParam("price") Double price,
             @RequestParam("category") String category,
             @RequestParam("condition") String condition,
-            @RequestParam("image") MultipartFile imageFile,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile,
+            @RequestParam(value = "imageUrl", required = false) String imageUrlParam,
             Principal principal) {
 
         try {
             User seller = userRepository.findByEmail(principal.getName())
                     .orElseThrow(() -> new RuntimeException("Seller not found"));
 
-            String imageUrl = imageUploadService.uploadImage(imageFile);
+            String imageUrl = null;
+            if (imageFile != null && !imageFile.isEmpty()) {
+                imageUrl = imageUploadService.uploadImage(imageFile);
+            } else if (imageUrlParam != null && !imageUrlParam.trim().isEmpty()) {
+                imageUrl = imageUrlParam.trim();
+            } else {
+                return ResponseEntity.badRequest().body(Map.of("message", "Please select an image file or provide an image URL"));
+            }
 
             Product product = new Product(title, description, price, category, condition, imageUrl, seller);
             Product savedProduct = productRepository.save(product);
@@ -95,6 +103,7 @@ public class ProductController {
             @RequestParam("category") String category,
             @RequestParam("condition") String condition,
             @RequestParam(value = "image", required = false) MultipartFile imageFile,
+            @RequestParam(value = "imageUrl", required = false) String imageUrlParam,
             Principal principal) {
 
         try {
@@ -120,6 +129,8 @@ public class ProductController {
             if (imageFile != null && !imageFile.isEmpty()) {
                 String imageUrl = imageUploadService.uploadImage(imageFile);
                 product.setImageUrl(imageUrl);
+            } else if (imageUrlParam != null && !imageUrlParam.trim().isEmpty()) {
+                product.setImageUrl(imageUrlParam.trim());
             }
 
             Product updatedProduct = productRepository.save(product);

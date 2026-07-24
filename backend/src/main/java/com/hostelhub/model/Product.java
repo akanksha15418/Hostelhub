@@ -26,7 +26,7 @@ public class Product {
     @Column(nullable = false)
     private String condition;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url", nullable = false, columnDefinition = "TEXT")
     private String imageUrl;
 
     @Column(nullable = false)
