@@ -27,8 +27,12 @@ const ProductDetails = () => {
       
       // If user is logged in, check if product is in their wishlist
       if (isAuthenticated) {
-        const check = await wishlistService.check(id);
-        setIsWishlisted(check.isWishlisted);
+        try {
+          const check = await wishlistService.check(id);
+          setIsWishlisted(check?.isWishlisted || false);
+        } catch (wErr) {
+          console.warn("Could not fetch wishlist status: ", wErr);
+        }
       }
     } catch (err) {
       setError('Product not found or failed to load details.');
